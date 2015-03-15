@@ -3,7 +3,6 @@ import sys
 
 '''
 # spark_query.py file_path column ( < | = | > ) int
-# For example:
 # python rankings.py hdfs://localhost:8020/tmp/benchmark/text/tiny/rankings pageRank \> 50
 '''
 
