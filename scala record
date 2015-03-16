@@ -5,3 +5,32 @@ val rankingTable = lines.map(line => line.split(","))
 val result = rankingTable.filter(row => row(1).toInt > 50)
 result.foreach(line => println(line.deep.mkString(" ")))
 #rankingTable.take(10).foreach(line => println(line.deep.mkString(" ")))
+
+
+
+
+val sc = new SparkContext(conf)
+val ranking = sc.textFile("hdfs://localhost:8020/tmp/benchmark/text/tiny/rankings")
+val uservisit = sc.textFile("hdfs://localhost:8020/tmp/benchmark/text/tiny/uservisits")
+val rankingTable = ranking.map(line => line.split(","))
+val uservisitTable = uservisit.map(line => line.split(","))
+val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
+val start_date = format.parse("1980-01-01")
+val end_date = format.parse("1980-04-01")
+val validDate = uservisitTable.filter(line => format.parse(line(2)).compareTo(start_date) >= 0 && format.parse(line(2)).compareTo(end_date) <= 0)
+val rankingPairs = rankingTable.map(line => (line(0), line))
+val uservisitPairs = uservisitTable.map(line => (line(1), line))
+val joinTable = uservisitPairs.join(rankingPairs)
+val sourceIPAsKey = joinTable.map(x => List(x(1)(0)(0), List(x(1)(1)(1).toDouble, x(1)(0)(3).toDouble)))
+
+
+
+
+
+scala> val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
+scala> val start_date = format.parse("1980-01-01")
+scala> val end_date = format.parse("1980-04-01")
+scala> val date = format.parse("1980-04-01")
+
+
+date.compareTo(start_date) >= 0 && date.compareTo(end_date) <= 0 
