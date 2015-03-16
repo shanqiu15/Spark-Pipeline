@@ -1,0 +1,48 @@
+import datetime
+
+
+input = sc.textFile("hdfs://localhost:8020/tmp/benchmark/text/tiny/uservisits")
+uservisit_table = input.map(lambda x: x.split(","))
+input = sc.textFile("hdfs://localhost:8020/tmp/benchmark/text/tiny/rankings")
+ranking_table = input.map(lambda x: x.split(","))
+
+fmt = '%Y-%m-%d'
+start_date = datetime.datetime.strptime("1980-01-01", fmt)
+end_date = datetime.datetime.strptime("1980-04-01", fmt)
+visit_time_result = uservisit_table.filter(lambda x: start_date <= datetime.datetime.strptime(x[2], fmt) <= end_date)
+
+ranking_pairs = ranking_table.map(lambda x: (x[0], x))
+uservisit_pairs = visit_time_result.map(lambda x: (x[1], x))
+
+#join_result data structure
+#(key = destURL, value = [uservisit, ranking])
+join_result = uservisit_pairs.join(ranking_pairs)
+
+#x[1][0][0]: source ip
+#x[1][1][1]: pageRank
+#x[1][0][3]: adRevenue
+#(sourceIP, [pageRank, adRevenue])
+#result: [(u'76.185.254.234', [25, 0.77573060000000005]), (u'47.232.127.221', [18, 0.46938342])]
+sourceIP_as_key = join_result.map(lambda x:(x[1][0][0], [int(x[1][1][1]), float(x[1][0][3])]))
+
+
+#result of map: (u'76.185.254.234', ([25, 0.77573060000000005], 1))
+
+def add_each_element(x, y):
+    return [x[i] + y[i] for i in xrange(len(x))]
+
+
+group_source = sourceIP_as_key.mapValues(lambda x: (x, 1)).reduceByKey(lambda x, y: (add_each_element(x[0], y[0]), x[1] + y[1]))
+
+#group_result = (totalRevenue, (avgPageRank, sourceIP))
+group_result = group_source.map(lambda x: (x[1][0][1], (float(x[1][0][0])/x[1][1], x[0])))
+
+result = group_result.sortByKey(False)
+
+>>> result.take(1)
+[(0.99927440000000001, (21.0, u'13.95.33.84'))]  
+
+
+
+
+

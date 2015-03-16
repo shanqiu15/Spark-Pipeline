@@ -2,7 +2,7 @@ from pyspark import SparkContext
 import sys
 
 '''
-python uservisits.py hdfs://localhost:8020/tmp/benchmark/text/tiny/uservisits
+python uservisits.py hdfs://localhost:8020/tmp/benchmark/text/tiny/uservisits 1 9
 '''
 
 class FileHandler(object):

@@ -1,0 +1,7 @@
+val lines = sc.textFile("hdfs://localhost:8020/tmp/benchmark/text/tiny/rankings")
+#println(lines.first())
+val rankingTable = lines.map(line => line.split(","))
+#println(rankingTable.first())
+val result = rankingTable.filter(row => row(1).toInt > 50)
+result.foreach(line => println(line.deep.mkString(" ")))
+#rankingTable.take(10).foreach(line => println(line.deep.mkString(" ")))
