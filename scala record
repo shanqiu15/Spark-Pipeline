@@ -7,8 +7,6 @@ result.foreach(line => println(line.deep.mkString(" ")))
 #rankingTable.take(10).foreach(line => println(line.deep.mkString(" ")))
 
 
-######################join_query##########################
-
 val sc = new SparkContext(conf)
 val ranking = sc.textFile("hdfs://localhost:8020/tmp/benchmark/text/tiny/rankings")
 val uservisit = sc.textFile("hdfs://localhost:8020/tmp/benchmark/text/tiny/uservisits")
@@ -19,7 +17,7 @@ val start_date = format.parse("1980-01-01")
 val end_date = format.parse("1980-04-01")
 val validDate = uservisitTable.filter(line => format.parse(line(2)).compareTo(start_date) >= 0 && format.parse(line(2)).compareTo(end_date) <= 0)
 val rankingPairs = rankingTable.map(line => (line(0), line))
-val uservisitPairs = uservisitTable.map(line => (line(1), line))
+val uservisitPairs = validDate.map(line => (line(1), line))
 val joinTable = uservisitPairs.join(rankingPairs)
 
 #x._2._1(0)   #sourceIP
@@ -31,3 +29,6 @@ val groupSourceIP = sourceIPAsKey.mapValues(x => (x, 1)).reduceByKey((x, y) => (
 val groupResult = groupSourceIP.map(x => (x._2._1._2, (x._2._1._1/x._2._2, x._1)))
 val result = groupResult.sortByKey(false)
 println(result.take(1)(0)._2._2, result.take(1)(0)._1, result.take(1)(0)._2._1)
+
+
+

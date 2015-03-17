@@ -51,4 +51,4 @@ def join_query(argv):
 if __name__ == "__main__":
    join_result = join_query(sys.argv)
    result = join_result.take(1)
-   print result
+   print str(result[0][1][1]) + ", " + str(result[0][0]) + ", " + str(result[0][1][0])
