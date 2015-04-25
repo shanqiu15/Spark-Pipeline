@@ -23,12 +23,6 @@ class UserVisits(FileHandler):
         self.result = self.pairs.reduceByKey(lambda x, y: x + y)
         for r in self.result.collect():
             print r
-
-    def stupid_show(self):
-        print "the last 5 result:"
-        for r in self.result.collect():
-            if r[0] in [u'99.9.58.40', u'99.90.160.', u'99.92.72.8', u'99.95.1.80', u'99.96.231.']:
-                print r
  
 def main(argv):
     path = argv[1]
